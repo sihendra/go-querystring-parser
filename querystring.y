@@ -17,7 +17,7 @@ package querystring
 %type <s>                tPHRASE
 %type <s>                tNUMBER
 %type <s>                posOrNegNumber
-%type <q>                searchBase searchParts searchPart searchLogicPart searchLogicSimplePart
+%type <q>                searchBase searchParts searchPart searchLogicPart searchLogicAndPart searchLogicOrPart searchLogicNotPart
 %type <n>                searchPrefix
 
 %%
@@ -51,30 +51,41 @@ searchLogicPart {
 };
 
 searchLogicPart:
-searchLogicSimplePart {
+searchLogicAndPart {
 	$$ = $1
 }
-|
-searchLogicSimplePart tAND searchLogicPart {
+;
+
+searchLogicAndPart:
+searchLogicOrPart tAND searchLogicAndPart {
 	$$ = NewAndCondition($1, $3)
 }
 |
-searchLogicSimplePart tOR searchLogicPart {
-	$$ = NewOrCondition($1, $3)
+searchLogicOrPart {
+	$$ = $1
 };
 
-searchLogicSimplePart:
+searchLogicOrPart:
+searchLogicNotPart tOR searchLogicOrPart {
+	$$ = NewOrCondition($1, $3)
+}
+|
+searchLogicNotPart {
+	$$ = $1
+};
+
+searchLogicNotPart:
+tNOT searchLogicNotPart {
+	$$ = NewNotCondition($2)
+}
+|
 searchBase {
 	$$ = $1
 }
 |
-tLEFTBRACKET searchLogicPart tRIGHTBRACKET {
+tLEFTBRACKET searchParts tRIGHTBRACKET {
 	$$ = $2
 }
-|
-tNOT searchLogicSimplePart {
-	$$ = NewNotCondition($2)
-};
 
 searchPrefix:
 tPLUS {

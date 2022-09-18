@@ -2,20 +2,22 @@
 state 0
 	$accept: .input $end 
 
-	tSTRING  shift 12
-	tPHRASE  shift 14
-	tNUMBER  shift 13
+	tSTRING  shift 14
+	tPHRASE  shift 16
+	tNUMBER  shift 15
 	tNOT  shift 11
 	tPLUS  shift 6
 	tMINUS  shift 7
-	tLEFTBRACKET  shift 10
+	tLEFTBRACKET  shift 13
 	.  error
 
-	searchBase  goto 9
+	searchBase  goto 12
 	searchParts  goto 2
 	searchPart  goto 3
 	searchLogicPart  goto 5
-	searchLogicSimplePart  goto 8
+	searchLogicAndPart  goto 8
+	searchLogicOrPart  goto 9
+	searchLogicNotPart  goto 10
 	searchPrefix  goto 4
 	input  goto 1
 
@@ -36,31 +38,33 @@ state 3
 	searchParts:  searchPart.searchParts 
 	searchParts:  searchPart.    (3)
 
-	tSTRING  shift 12
-	tPHRASE  shift 14
-	tNUMBER  shift 13
+	tSTRING  shift 14
+	tPHRASE  shift 16
+	tNUMBER  shift 15
 	tNOT  shift 11
 	tPLUS  shift 6
 	tMINUS  shift 7
-	tLEFTBRACKET  shift 10
+	tLEFTBRACKET  shift 13
 	.  reduce 3 (src line 34)
 
-	searchBase  goto 9
-	searchParts  goto 15
+	searchBase  goto 12
+	searchParts  goto 17
 	searchPart  goto 3
 	searchLogicPart  goto 5
-	searchLogicSimplePart  goto 8
+	searchLogicAndPart  goto 8
+	searchLogicOrPart  goto 9
+	searchLogicNotPart  goto 10
 	searchPrefix  goto 4
 
 state 4
 	searchPart:  searchPrefix.searchBase 
 
-	tSTRING  shift 12
-	tPHRASE  shift 14
-	tNUMBER  shift 13
+	tSTRING  shift 14
+	tPHRASE  shift 16
+	tNUMBER  shift 15
 	.  error
 
-	searchBase  goto 16
+	searchBase  goto 18
 
 state 5
 	searchPart:  searchLogicPart.    (5)
@@ -69,62 +73,81 @@ state 5
 
 
 state 6
-	searchPrefix:  tPLUS.    (12)
+	searchPrefix:  tPLUS.    (14)
 
-	.  reduce 12 (src line 79)
+	.  reduce 14 (src line 90)
 
 
 state 7
-	searchPrefix:  tMINUS.    (13)
+	searchPrefix:  tMINUS.    (15)
 
-	.  reduce 13 (src line 83)
+	.  reduce 15 (src line 94)
 
 
 state 8
-	searchLogicPart:  searchLogicSimplePart.    (6)
-	searchLogicPart:  searchLogicSimplePart.tAND searchLogicPart 
-	searchLogicPart:  searchLogicSimplePart.tOR searchLogicPart 
+	searchLogicPart:  searchLogicAndPart.    (6)
 
-	tAND  shift 17
-	tOR  shift 18
 	.  reduce 6 (src line 53)
 
 
 state 9
-	searchLogicSimplePart:  searchBase.    (9)
+	searchLogicAndPart:  searchLogicOrPart.tAND searchLogicAndPart 
+	searchLogicAndPart:  searchLogicOrPart.    (8)
 
-	.  reduce 9 (src line 66)
+	tAND  shift 19
+	.  reduce 8 (src line 63)
 
 
 state 10
-	searchLogicSimplePart:  tLEFTBRACKET.searchLogicPart tRIGHTBRACKET 
+	searchLogicOrPart:  searchLogicNotPart.tOR searchLogicOrPart 
+	searchLogicOrPart:  searchLogicNotPart.    (10)
 
-	tSTRING  shift 12
-	tPHRASE  shift 14
-	tNUMBER  shift 13
-	tNOT  shift 11
-	tLEFTBRACKET  shift 10
-	.  error
+	tOR  shift 20
+	.  reduce 10 (src line 72)
 
-	searchBase  goto 9
-	searchLogicPart  goto 19
-	searchLogicSimplePart  goto 8
 
 state 11
-	searchLogicSimplePart:  tNOT.searchLogicSimplePart 
+	searchLogicNotPart:  tNOT.searchLogicNotPart 
 
-	tSTRING  shift 12
-	tPHRASE  shift 14
-	tNUMBER  shift 13
+	tSTRING  shift 14
+	tPHRASE  shift 16
+	tNUMBER  shift 15
 	tNOT  shift 11
-	tLEFTBRACKET  shift 10
+	tLEFTBRACKET  shift 13
 	.  error
 
-	searchBase  goto 9
-	searchLogicSimplePart  goto 20
+	searchBase  goto 12
+	searchLogicNotPart  goto 21
 
 state 12
-	searchBase:  tSTRING.    (14)
+	searchLogicNotPart:  searchBase.    (12)
+
+	.  reduce 12 (src line 81)
+
+
+state 13
+	searchLogicNotPart:  tLEFTBRACKET.searchParts tRIGHTBRACKET 
+
+	tSTRING  shift 14
+	tPHRASE  shift 16
+	tNUMBER  shift 15
+	tNOT  shift 11
+	tPLUS  shift 6
+	tMINUS  shift 7
+	tLEFTBRACKET  shift 13
+	.  error
+
+	searchBase  goto 12
+	searchParts  goto 22
+	searchPart  goto 3
+	searchLogicPart  goto 5
+	searchLogicAndPart  goto 8
+	searchLogicOrPart  goto 9
+	searchLogicNotPart  goto 10
+	searchPrefix  goto 4
+
+state 14
+	searchBase:  tSTRING.    (16)
 	searchBase:  tSTRING.tCOLON tSTRING 
 	searchBase:  tSTRING.tCOLON posOrNegNumber 
 	searchBase:  tSTRING.tCOLON tPHRASE 
@@ -139,76 +162,77 @@ state 12
 	searchBase:  tSTRING.tCOLON tLEFTRANGE posOrNegNumber tTO posOrNegNumber tRIGHTRANGE 
 	searchBase:  tSTRING.tCOLON tLEFTRANGE tPHRASE tTO tPHRASE tRIGHTRANGE 
 
-	tCOLON  shift 21
-	.  reduce 14 (src line 88)
-
-
-state 13
-	searchBase:  tNUMBER.    (15)
-
-	.  reduce 15 (src line 92)
-
-
-state 14
-	searchBase:  tPHRASE.    (16)
-
-	.  reduce 16 (src line 96)
+	tCOLON  shift 23
+	.  reduce 16 (src line 99)
 
 
 state 15
+	searchBase:  tNUMBER.    (17)
+
+	.  reduce 17 (src line 103)
+
+
+state 16
+	searchBase:  tPHRASE.    (18)
+
+	.  reduce 18 (src line 107)
+
+
+state 17
 	searchParts:  searchPart searchParts.    (2)
 
 	.  reduce 2 (src line 30)
 
 
-state 16
+state 18
 	searchPart:  searchPrefix searchBase.    (4)
 
 	.  reduce 4 (src line 39)
 
 
-state 17
-	searchLogicPart:  searchLogicSimplePart tAND.searchLogicPart 
-
-	tSTRING  shift 12
-	tPHRASE  shift 14
-	tNUMBER  shift 13
-	tNOT  shift 11
-	tLEFTBRACKET  shift 10
-	.  error
-
-	searchBase  goto 9
-	searchLogicPart  goto 22
-	searchLogicSimplePart  goto 8
-
-state 18
-	searchLogicPart:  searchLogicSimplePart tOR.searchLogicPart 
-
-	tSTRING  shift 12
-	tPHRASE  shift 14
-	tNUMBER  shift 13
-	tNOT  shift 11
-	tLEFTBRACKET  shift 10
-	.  error
-
-	searchBase  goto 9
-	searchLogicPart  goto 23
-	searchLogicSimplePart  goto 8
-
 state 19
-	searchLogicSimplePart:  tLEFTBRACKET searchLogicPart.tRIGHTBRACKET 
+	searchLogicAndPart:  searchLogicOrPart tAND.searchLogicAndPart 
 
-	tRIGHTBRACKET  shift 24
+	tSTRING  shift 14
+	tPHRASE  shift 16
+	tNUMBER  shift 15
+	tNOT  shift 11
+	tLEFTBRACKET  shift 13
 	.  error
 
+	searchBase  goto 12
+	searchLogicAndPart  goto 24
+	searchLogicOrPart  goto 9
+	searchLogicNotPart  goto 10
 
 state 20
-	searchLogicSimplePart:  tNOT searchLogicSimplePart.    (11)
+	searchLogicOrPart:  searchLogicNotPart tOR.searchLogicOrPart 
 
-	.  reduce 11 (src line 74)
+	tSTRING  shift 14
+	tPHRASE  shift 16
+	tNUMBER  shift 15
+	tNOT  shift 11
+	tLEFTBRACKET  shift 13
+	.  error
 
+	searchBase  goto 12
+	searchLogicOrPart  goto 25
+	searchLogicNotPart  goto 10
 
 state 21
+	searchLogicNotPart:  tNOT searchLogicNotPart.    (11)
+
+	.  reduce 11 (src line 77)
+
+
+state 22
+	searchLogicNotPart:  tLEFTBRACKET searchParts.tRIGHTBRACKET 
+
+	tRIGHTBRACKET  shift 26
+	.  error
+
+
+state 23
 	searchBase:  tSTRING tCOLON.tSTRING 
 	searchBase:  tSTRING tCOLON.posOrNegNumber 
 	searchBase:  tSTRING tCOLON.tPHRASE 
@@ -223,246 +247,246 @@ state 21
 	searchBase:  tSTRING tCOLON.tLEFTRANGE posOrNegNumber tTO posOrNegNumber tRIGHTRANGE 
 	searchBase:  tSTRING tCOLON.tLEFTRANGE tPHRASE tTO tPHRASE tRIGHTRANGE 
 
-	tSTRING  shift 25
-	tPHRASE  shift 27
-	tNUMBER  shift 31
-	tMINUS  shift 32
-	tLEFTRANGE  shift 30
-	tGREATER  shift 28
-	tLESS  shift 29
+	tSTRING  shift 27
+	tPHRASE  shift 29
+	tNUMBER  shift 33
+	tMINUS  shift 34
+	tLEFTRANGE  shift 32
+	tGREATER  shift 30
+	tLESS  shift 31
 	.  error
 
-	posOrNegNumber  goto 26
-
-state 22
-	searchLogicPart:  searchLogicSimplePart tAND searchLogicPart.    (7)
-
-	.  reduce 7 (src line 57)
-
-
-state 23
-	searchLogicPart:  searchLogicSimplePart tOR searchLogicPart.    (8)
-
-	.  reduce 8 (src line 61)
-
+	posOrNegNumber  goto 28
 
 state 24
-	searchLogicSimplePart:  tLEFTBRACKET searchLogicPart tRIGHTBRACKET.    (10)
+	searchLogicAndPart:  searchLogicOrPart tAND searchLogicAndPart.    (7)
 
-	.  reduce 10 (src line 70)
+	.  reduce 7 (src line 59)
 
 
 state 25
-	searchBase:  tSTRING tCOLON tSTRING.    (17)
+	searchLogicOrPart:  searchLogicNotPart tOR searchLogicOrPart.    (9)
 
-	.  reduce 17 (src line 102)
+	.  reduce 9 (src line 68)
 
 
 state 26
-	searchBase:  tSTRING tCOLON posOrNegNumber.    (18)
+	searchLogicNotPart:  tLEFTBRACKET searchParts tRIGHTBRACKET.    (13)
 
-	.  reduce 18 (src line 108)
+	.  reduce 13 (src line 85)
 
 
 state 27
-	searchBase:  tSTRING tCOLON tPHRASE.    (19)
+	searchBase:  tSTRING tCOLON tSTRING.    (19)
 
-	.  reduce 19 (src line 115)
+	.  reduce 19 (src line 113)
 
 
 state 28
+	searchBase:  tSTRING tCOLON posOrNegNumber.    (20)
+
+	.  reduce 20 (src line 119)
+
+
+state 29
+	searchBase:  tSTRING tCOLON tPHRASE.    (21)
+
+	.  reduce 21 (src line 126)
+
+
+state 30
 	searchBase:  tSTRING tCOLON tGREATER.posOrNegNumber 
 	searchBase:  tSTRING tCOLON tGREATER.tEQUAL posOrNegNumber 
 	searchBase:  tSTRING tCOLON tGREATER.tPHRASE 
 	searchBase:  tSTRING tCOLON tGREATER.tEQUAL tPHRASE 
 
-	tPHRASE  shift 35
-	tNUMBER  shift 31
-	tMINUS  shift 32
-	tEQUAL  shift 34
+	tPHRASE  shift 37
+	tNUMBER  shift 33
+	tMINUS  shift 34
+	tEQUAL  shift 36
 	.  error
 
-	posOrNegNumber  goto 33
+	posOrNegNumber  goto 35
 
-state 29
+state 31
 	searchBase:  tSTRING tCOLON tLESS.posOrNegNumber 
 	searchBase:  tSTRING tCOLON tLESS.tEQUAL posOrNegNumber 
 	searchBase:  tSTRING tCOLON tLESS.tPHRASE 
 	searchBase:  tSTRING tCOLON tLESS.tEQUAL tPHRASE 
 
-	tPHRASE  shift 38
-	tNUMBER  shift 31
-	tMINUS  shift 32
-	tEQUAL  shift 37
+	tPHRASE  shift 40
+	tNUMBER  shift 33
+	tMINUS  shift 34
+	tEQUAL  shift 39
 	.  error
 
-	posOrNegNumber  goto 36
+	posOrNegNumber  goto 38
 
-state 30
+state 32
 	searchBase:  tSTRING tCOLON tLEFTRANGE.posOrNegNumber tTO posOrNegNumber tRIGHTRANGE 
 	searchBase:  tSTRING tCOLON tLEFTRANGE.tPHRASE tTO tPHRASE tRIGHTRANGE 
 
-	tPHRASE  shift 40
-	tNUMBER  shift 31
-	tMINUS  shift 32
+	tPHRASE  shift 42
+	tNUMBER  shift 33
+	tMINUS  shift 34
 	.  error
 
-	posOrNegNumber  goto 39
-
-state 31
-	posOrNegNumber:  tNUMBER.    (30)
-
-	.  reduce 30 (src line 194)
-
-
-state 32
-	posOrNegNumber:  tMINUS.tNUMBER 
-
-	tNUMBER  shift 41
-	.  error
-
+	posOrNegNumber  goto 41
 
 state 33
-	searchBase:  tSTRING tCOLON tGREATER posOrNegNumber.    (20)
+	posOrNegNumber:  tNUMBER.    (32)
 
-	.  reduce 20 (src line 121)
+	.  reduce 32 (src line 205)
 
 
 state 34
-	searchBase:  tSTRING tCOLON tGREATER tEQUAL.posOrNegNumber 
-	searchBase:  tSTRING tCOLON tGREATER tEQUAL.tPHRASE 
+	posOrNegNumber:  tMINUS.tNUMBER 
 
-	tPHRASE  shift 43
-	tNUMBER  shift 31
-	tMINUS  shift 32
+	tNUMBER  shift 43
 	.  error
 
-	posOrNegNumber  goto 42
 
 state 35
-	searchBase:  tSTRING tCOLON tGREATER tPHRASE.    (24)
+	searchBase:  tSTRING tCOLON tGREATER posOrNegNumber.    (22)
 
-	.  reduce 24 (src line 149)
+	.  reduce 22 (src line 132)
 
 
 state 36
-	searchBase:  tSTRING tCOLON tLESS posOrNegNumber.    (22)
-
-	.  reduce 22 (src line 135)
-
-
-state 37
-	searchBase:  tSTRING tCOLON tLESS tEQUAL.posOrNegNumber 
-	searchBase:  tSTRING tCOLON tLESS tEQUAL.tPHRASE 
+	searchBase:  tSTRING tCOLON tGREATER tEQUAL.posOrNegNumber 
+	searchBase:  tSTRING tCOLON tGREATER tEQUAL.tPHRASE 
 
 	tPHRASE  shift 45
-	tNUMBER  shift 31
-	tMINUS  shift 32
+	tNUMBER  shift 33
+	tMINUS  shift 34
 	.  error
 
 	posOrNegNumber  goto 44
 
-state 38
-	searchBase:  tSTRING tCOLON tLESS tPHRASE.    (26)
+state 37
+	searchBase:  tSTRING tCOLON tGREATER tPHRASE.    (26)
 
-	.  reduce 26 (src line 163)
+	.  reduce 26 (src line 160)
+
+
+state 38
+	searchBase:  tSTRING tCOLON tLESS posOrNegNumber.    (24)
+
+	.  reduce 24 (src line 146)
 
 
 state 39
-	searchBase:  tSTRING tCOLON tLEFTRANGE posOrNegNumber.tTO posOrNegNumber tRIGHTRANGE 
+	searchBase:  tSTRING tCOLON tLESS tEQUAL.posOrNegNumber 
+	searchBase:  tSTRING tCOLON tLESS tEQUAL.tPHRASE 
 
-	tTO  shift 46
+	tPHRASE  shift 47
+	tNUMBER  shift 33
+	tMINUS  shift 34
 	.  error
 
+	posOrNegNumber  goto 46
 
 state 40
-	searchBase:  tSTRING tCOLON tLEFTRANGE tPHRASE.tTO tPHRASE tRIGHTRANGE 
+	searchBase:  tSTRING tCOLON tLESS tPHRASE.    (28)
 
-	tTO  shift 47
-	.  error
+	.  reduce 28 (src line 174)
 
 
 state 41
-	posOrNegNumber:  tMINUS tNUMBER.    (31)
+	searchBase:  tSTRING tCOLON tLEFTRANGE posOrNegNumber.tTO posOrNegNumber tRIGHTRANGE 
 
-	.  reduce 31 (src line 198)
+	tTO  shift 48
+	.  error
 
 
 state 42
-	searchBase:  tSTRING tCOLON tGREATER tEQUAL posOrNegNumber.    (21)
+	searchBase:  tSTRING tCOLON tLEFTRANGE tPHRASE.tTO tPHRASE tRIGHTRANGE 
 
-	.  reduce 21 (src line 128)
+	tTO  shift 49
+	.  error
 
 
 state 43
-	searchBase:  tSTRING tCOLON tGREATER tEQUAL tPHRASE.    (25)
+	posOrNegNumber:  tMINUS tNUMBER.    (33)
 
-	.  reduce 25 (src line 156)
+	.  reduce 33 (src line 209)
 
 
 state 44
-	searchBase:  tSTRING tCOLON tLESS tEQUAL posOrNegNumber.    (23)
+	searchBase:  tSTRING tCOLON tGREATER tEQUAL posOrNegNumber.    (23)
 
-	.  reduce 23 (src line 142)
+	.  reduce 23 (src line 139)
 
 
 state 45
-	searchBase:  tSTRING tCOLON tLESS tEQUAL tPHRASE.    (27)
+	searchBase:  tSTRING tCOLON tGREATER tEQUAL tPHRASE.    (27)
 
-	.  reduce 27 (src line 170)
+	.  reduce 27 (src line 167)
 
 
 state 46
-	searchBase:  tSTRING tCOLON tLEFTRANGE posOrNegNumber tTO.posOrNegNumber tRIGHTRANGE 
+	searchBase:  tSTRING tCOLON tLESS tEQUAL posOrNegNumber.    (25)
 
-	tNUMBER  shift 31
-	tMINUS  shift 32
-	.  error
+	.  reduce 25 (src line 153)
 
-	posOrNegNumber  goto 48
 
 state 47
-	searchBase:  tSTRING tCOLON tLEFTRANGE tPHRASE tTO.tPHRASE tRIGHTRANGE 
+	searchBase:  tSTRING tCOLON tLESS tEQUAL tPHRASE.    (29)
 
-	tPHRASE  shift 49
-	.  error
+	.  reduce 29 (src line 181)
 
 
 state 48
-	searchBase:  tSTRING tCOLON tLEFTRANGE posOrNegNumber tTO posOrNegNumber.tRIGHTRANGE 
+	searchBase:  tSTRING tCOLON tLEFTRANGE posOrNegNumber tTO.posOrNegNumber tRIGHTRANGE 
 
-	tRIGHTRANGE  shift 50
+	tNUMBER  shift 33
+	tMINUS  shift 34
 	.  error
 
+	posOrNegNumber  goto 50
 
 state 49
-	searchBase:  tSTRING tCOLON tLEFTRANGE tPHRASE tTO tPHRASE.tRIGHTRANGE 
+	searchBase:  tSTRING tCOLON tLEFTRANGE tPHRASE tTO.tPHRASE tRIGHTRANGE 
 
-	tRIGHTRANGE  shift 51
+	tPHRASE  shift 51
 	.  error
 
 
 state 50
-	searchBase:  tSTRING tCOLON tLEFTRANGE posOrNegNumber tTO posOrNegNumber tRIGHTRANGE.    (28)
+	searchBase:  tSTRING tCOLON tLEFTRANGE posOrNegNumber tTO posOrNegNumber.tRIGHTRANGE 
 
-	.  reduce 28 (src line 177)
+	tRIGHTRANGE  shift 52
+	.  error
 
 
 state 51
-	searchBase:  tSTRING tCOLON tLEFTRANGE tPHRASE tTO tPHRASE tRIGHTRANGE.    (29)
+	searchBase:  tSTRING tCOLON tLEFTRANGE tPHRASE tTO tPHRASE.tRIGHTRANGE 
 
-	.  reduce 29 (src line 185)
+	tRIGHTRANGE  shift 53
+	.  error
 
 
-20 terminals, 9 nonterminals
-32 grammar rules, 52/8000 states
+state 52
+	searchBase:  tSTRING tCOLON tLEFTRANGE posOrNegNumber tTO posOrNegNumber tRIGHTRANGE.    (30)
+
+	.  reduce 30 (src line 188)
+
+
+state 53
+	searchBase:  tSTRING tCOLON tLEFTRANGE tPHRASE tTO tPHRASE tRIGHTRANGE.    (31)
+
+	.  reduce 31 (src line 196)
+
+
+20 terminals, 11 nonterminals
+34 grammar rules, 54/16000 states
 0 shift/reduce, 0 reduce/reduce conflicts reported
-58 working sets used
-memory: parser 31/120000
-12 extra closures
-73 shift entries, 1 exceptions
-20 goto entries
-12 entries saved by goto default
-Optimizer space used: output 73/120000
-73 table entries, 2 zero
-maximum spread: 20, maximum offset: 46
+60 working sets used
+memory: parser 41/240000
+21 extra closures
+75 shift entries, 1 exceptions
+22 goto entries
+20 entries saved by goto default
+Optimizer space used: output 73/240000
+73 table entries, 0 zero
+maximum spread: 20, maximum offset: 48

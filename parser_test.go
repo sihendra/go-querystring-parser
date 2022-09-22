@@ -160,26 +160,21 @@ func TestParser(t *testing.T) {
 	})
 
 	t.Run("WithPrecedence", func(t *testing.T) {
-		cond, err := Parse("a OR b NOT c AND d")
+		cond, err := Parse("a OR b AND NOT c")
 		require.NoError(t, err)
 
 		expected := Condition(&OrCondition{
-			Left: &OrCondition{
-				Left: &MatchCondition{
-					Value: "a",
-				},
-				Right: &MatchCondition{
-					Value: "b",
-				},
+			Left: &MatchCondition{
+				Value: "a",
 			},
 			Right: &AndCondition{
-				Left: &NotCondition{
+				Left: &MatchCondition{
+					Value: "b",
+				},
+				Right: &NotCondition{
 					Condition: &MatchCondition{
 						Value: "c",
 					},
-				},
-				Right: &MatchCondition{
-					Value: "d",
 				},
 			},
 		})

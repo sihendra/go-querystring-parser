@@ -15,8 +15,8 @@ state 0
 	searchParts  goto 2
 	searchPart  goto 3
 	searchLogicPart  goto 5
-	searchLogicAndPart  goto 8
-	searchLogicOrPart  goto 9
+	searchLogicAndPart  goto 9
+	searchLogicOrPart  goto 8
 	searchLogicNotPart  goto 10
 	searchPrefix  goto 4
 	input  goto 1
@@ -51,8 +51,8 @@ state 3
 	searchParts  goto 17
 	searchPart  goto 3
 	searchLogicPart  goto 5
-	searchLogicAndPart  goto 8
-	searchLogicOrPart  goto 9
+	searchLogicAndPart  goto 9
+	searchLogicOrPart  goto 8
 	searchLogicNotPart  goto 10
 	searchPrefix  goto 4
 
@@ -85,24 +85,24 @@ state 7
 
 
 state 8
-	searchLogicPart:  searchLogicAndPart.    (6)
+	searchLogicPart:  searchLogicOrPart.    (6)
 
 	.  reduce 6 (src line 53)
 
 
 state 9
-	searchLogicAndPart:  searchLogicOrPart.tAND searchLogicAndPart 
-	searchLogicAndPart:  searchLogicOrPart.    (8)
+	searchLogicOrPart:  searchLogicAndPart.tOR searchLogicOrPart 
+	searchLogicOrPart:  searchLogicAndPart.    (8)
 
-	tAND  shift 19
+	tOR  shift 19
 	.  reduce 8 (src line 63)
 
 
 state 10
-	searchLogicOrPart:  searchLogicNotPart.tOR searchLogicOrPart 
-	searchLogicOrPart:  searchLogicNotPart.    (10)
+	searchLogicAndPart:  searchLogicNotPart.tAND searchLogicAndPart 
+	searchLogicAndPart:  searchLogicNotPart.    (10)
 
-	tOR  shift 20
+	tAND  shift 20
 	.  reduce 10 (src line 72)
 
 
@@ -141,8 +141,8 @@ state 13
 	searchParts  goto 22
 	searchPart  goto 3
 	searchLogicPart  goto 5
-	searchLogicAndPart  goto 8
-	searchLogicOrPart  goto 9
+	searchLogicAndPart  goto 9
+	searchLogicOrPart  goto 8
 	searchLogicNotPart  goto 10
 	searchPrefix  goto 4
 
@@ -191,7 +191,7 @@ state 18
 
 
 state 19
-	searchLogicAndPart:  searchLogicOrPart tAND.searchLogicAndPart 
+	searchLogicOrPart:  searchLogicAndPart tOR.searchLogicOrPart 
 
 	tSTRING  shift 14
 	tPHRASE  shift 16
@@ -201,12 +201,12 @@ state 19
 	.  error
 
 	searchBase  goto 12
-	searchLogicAndPart  goto 24
-	searchLogicOrPart  goto 9
+	searchLogicAndPart  goto 9
+	searchLogicOrPart  goto 24
 	searchLogicNotPart  goto 10
 
 state 20
-	searchLogicOrPart:  searchLogicNotPart tOR.searchLogicOrPart 
+	searchLogicAndPart:  searchLogicNotPart tAND.searchLogicAndPart 
 
 	tSTRING  shift 14
 	tPHRASE  shift 16
@@ -216,7 +216,7 @@ state 20
 	.  error
 
 	searchBase  goto 12
-	searchLogicOrPart  goto 25
+	searchLogicAndPart  goto 25
 	searchLogicNotPart  goto 10
 
 state 21
@@ -259,13 +259,13 @@ state 23
 	posOrNegNumber  goto 28
 
 state 24
-	searchLogicAndPart:  searchLogicOrPart tAND searchLogicAndPart.    (7)
+	searchLogicOrPart:  searchLogicAndPart tOR searchLogicOrPart.    (7)
 
 	.  reduce 7 (src line 59)
 
 
 state 25
-	searchLogicOrPart:  searchLogicNotPart tOR searchLogicOrPart.    (9)
+	searchLogicAndPart:  searchLogicNotPart tAND searchLogicAndPart.    (9)
 
 	.  reduce 9 (src line 68)
 
@@ -482,7 +482,7 @@ state 53
 34 grammar rules, 54/16000 states
 0 shift/reduce, 0 reduce/reduce conflicts reported
 60 working sets used
-memory: parser 41/240000
+memory: parser 42/240000
 21 extra closures
 75 shift entries, 1 exceptions
 22 goto entries

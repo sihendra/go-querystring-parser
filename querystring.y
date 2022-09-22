@@ -29,7 +29,7 @@ searchParts {
 
 searchParts:
 searchPart searchParts {
-	$$ = NewAndCondition($1, $2)
+	$$ = NewOrCondition($1, $2)
 }
 |
 searchPart {
@@ -51,23 +51,23 @@ searchLogicPart {
 };
 
 searchLogicPart:
-searchLogicAndPart {
+searchLogicOrPart {
 	$$ = $1
 }
 ;
 
-searchLogicAndPart:
-searchLogicOrPart tAND searchLogicAndPart {
-	$$ = NewAndCondition($1, $3)
+searchLogicOrPart:
+searchLogicAndPart tOR searchLogicOrPart {
+	$$ = NewOrCondition($1, $3)
 }
 |
-searchLogicOrPart {
+searchLogicAndPart {
 	$$ = $1
 };
 
-searchLogicOrPart:
-searchLogicNotPart tOR searchLogicOrPart {
-	$$ = NewOrCondition($1, $3)
+searchLogicAndPart:
+searchLogicNotPart tAND searchLogicAndPart {
+	$$ = NewAndCondition($1, $3)
 }
 |
 searchLogicNotPart {

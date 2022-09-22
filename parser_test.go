@@ -9,12 +9,32 @@ import (
 )
 
 func TestParser(t *testing.T) {
+	t.Run("WithoutOperator", func(t *testing.T) {
+		cond, err := Parse("a b c")
+		require.NoError(t, err)
+
+		expected := Condition(&OrCondition{
+			Left: &MatchCondition{Value: "a"},
+			Right: &OrCondition{
+				Left: &MatchCondition{
+					Value: "b",
+				},
+				Right: &MatchCondition{
+					Value: "c",
+				},
+			},
+		})
+		spew.Dump(cond)
+		diff := deep.Equal(cond, expected)
+		require.Nil(t, diff)
+	})
+
 	t.Run("WithNested", func(t *testing.T) {
 		cond, err := Parse("(a NOT (b OR c)) OR (d)")
 		require.NoError(t, err)
 
 		expected := Condition(&OrCondition{
-			Left: &AndCondition{
+			Left: &OrCondition{
 				Left: &MatchCondition{Value: "a"},
 				Right: &NotCondition{Condition: &OrCondition{
 					Left:  &MatchCondition{Value: "b"},
@@ -34,7 +54,7 @@ func TestParser(t *testing.T) {
 		cond, err := Parse("\"a b c\" d")
 		require.NoError(t, err)
 
-		expected := Condition(&AndCondition{
+		expected := Condition(&OrCondition{
 			Left: &MatchCondition{Value: "a b c"},
 			Right: &MatchCondition{
 				Value: "d",
@@ -49,7 +69,7 @@ func TestParser(t *testing.T) {
 		cond, err := Parse("a NOT b")
 		require.NoError(t, err)
 
-		expected := Condition(&AndCondition{
+		expected := Condition(&OrCondition{
 			Left: &MatchCondition{
 				Value: "a",
 			},
@@ -68,7 +88,7 @@ func TestParser(t *testing.T) {
 		cond, err := Parse("(a NOT b)")
 		require.NoError(t, err)
 
-		expected := Condition(&AndCondition{
+		expected := Condition(&OrCondition{
 			Left: &MatchCondition{
 				Value: "a",
 			},
@@ -123,7 +143,7 @@ func TestParser(t *testing.T) {
 		cond, err := Parse("a NOT (b OR c)")
 		require.NoError(t, err)
 
-		expected := Condition(&AndCondition{
+		expected := Condition(&OrCondition{
 			Left: &MatchCondition{
 				Value: "a",
 			},
@@ -140,26 +160,21 @@ func TestParser(t *testing.T) {
 	})
 
 	t.Run("WithPrecedence", func(t *testing.T) {
-		cond, err := Parse("a OR b NOT c AND d")
+		cond, err := Parse("a OR b AND NOT c")
 		require.NoError(t, err)
 
-		expected := Condition(&AndCondition{
-			Left: &OrCondition{
-				Left: &MatchCondition{
-					Value: "a",
-				},
-				Right: &MatchCondition{
-					Value: "b",
-				},
+		expected := Condition(&OrCondition{
+			Left: &MatchCondition{
+				Value: "a",
 			},
 			Right: &AndCondition{
-				Left: &NotCondition{
+				Left: &MatchCondition{
+					Value: "b",
+				},
+				Right: &NotCondition{
 					Condition: &MatchCondition{
 						Value: "c",
 					},
-				},
-				Right: &MatchCondition{
-					Value: "d",
 				},
 			},
 		})

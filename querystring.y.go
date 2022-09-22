@@ -490,7 +490,7 @@ yydefault:
 		yyDollar = yyS[yypt-2 : yypt+1]
 //line querystring.y:31
 		{
-			yyVAL.q = NewAndCondition(yyDollar[1].q, yyDollar[2].q)
+			yyVAL.q = NewOrCondition(yyDollar[1].q, yyDollar[2].q)
 		}
 	case 3:
 		yyDollar = yyS[yypt-1 : yypt+1]

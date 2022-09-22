@@ -29,7 +29,7 @@ searchParts {
 
 searchParts:
 searchPart searchParts {
-	$$ = NewAndCondition($1, $2)
+	$$ = NewOrCondition($1, $2)
 }
 |
 searchPart {
